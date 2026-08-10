@@ -9,6 +9,7 @@ import com.arthur.classroomreservation.exception.ClassroomNotFoundException;
 import com.arthur.classroomreservation.repository.ClassroomRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -81,5 +82,12 @@ public class ClassroomService {
         classroom.setAvailable(available);
 
         return ClassroomResponseDTO.from(classroomRepository.save(classroom));
+    }
+
+    public List<ClassroomResponseDTO> list(Boolean available) {
+        return classroomRepository.findByAvailableOptional(available)
+                .stream()
+                .map(ClassroomResponseDTO::from)
+                .toList();
     }
 }
