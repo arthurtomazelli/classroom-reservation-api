@@ -9,6 +9,7 @@ import com.arthur.classroomreservation.exception.ClassroomNotFoundException;
 import com.arthur.classroomreservation.repository.ClassroomRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -60,7 +61,7 @@ public class ClassroomService {
     public ClassroomResponseDTO findById(UUID id) {
         return ClassroomResponseDTO.from(
                 classroomRepository.findById(id)
-                .orElseThrow(() -> new ClassroomNotFoundException(id))) ;
+                        .orElseThrow(() -> new ClassroomNotFoundException(id))) ;
     }
 
     public ClassroomResponseDTO deactivate(UUID id) {
@@ -85,5 +86,17 @@ public class ClassroomService {
                 .stream()
                 .map(ClassroomResponseDTO::from)
                 .toList();
+    }
+
+    public List<ClassroomResponseDTO> findFreeForReservation(LocalDateTime startTime, LocalDateTime endTime) {
+        return classroomRepository.findFreeForReservation(startTime, endTime)
+                .stream()
+                .map(ClassroomResponseDTO::from)
+                .toList();
+    }
+
+    public Classroom getEntityById(UUID id) {
+        return classroomRepository.findById(id)
+                .orElseThrow(() -> new ClassroomNotFoundException(id));
     }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,11 +30,12 @@ public class ClassroomController {
         this.classroomService = classroomService;
     }
 
-    @PostMapping()
+    @PostMapping
     public ResponseEntity<ClassroomResponseDTO> create(
             @Valid @RequestBody ClassroomRequestDTO classroomRequestDTO
     ) {
         ClassroomResponseDTO response = classroomService.create(classroomRequestDTO);
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
     }
@@ -43,6 +45,7 @@ public class ClassroomController {
             @PathVariable UUID id
     ) {
         ClassroomResponseDTO response = classroomService.findById(id);
+
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -79,6 +82,16 @@ public class ClassroomController {
             @PathVariable UUID id
     ) {
         ClassroomResponseDTO response = classroomService.deactivate(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/free")
+    public ResponseEntity<List<ClassroomResponseDTO>> findFreeForReservation(
+            @RequestParam() LocalDateTime startTime,
+            @RequestParam() LocalDateTime endTime
+    ) {
+        List<ClassroomResponseDTO> response = classroomService.findFreeForReservation(startTime, endTime);
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

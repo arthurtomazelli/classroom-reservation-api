@@ -2,7 +2,10 @@ package com.arthur.classroomreservation.handler;
 
 import com.arthur.classroomreservation.dto.response.ErrorResponseDTO;
 import com.arthur.classroomreservation.exception.ClassroomAlreadyExistsException;
+import com.arthur.classroomreservation.exception.ClassroomAlreadyReservedAtSpecificPeriodException;
 import com.arthur.classroomreservation.exception.ClassroomNotFoundException;
+import com.arthur.classroomreservation.exception.InvalidReservationPeriodException;
+import com.arthur.classroomreservation.exception.ReservationNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -23,6 +26,22 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ClassroomNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleException(ClassroomNotFoundException exception) {
         return createEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+
+    @ExceptionHandler(ReservationNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleException(ReservationNotFoundException exception) {
+        return createEntity(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(ClassroomAlreadyReservedAtSpecificPeriodException.class)
+    public ResponseEntity<ErrorResponseDTO> handleException(ClassroomAlreadyReservedAtSpecificPeriodException exception) {
+        return createEntity(exception.getMessage(), HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(InvalidReservationPeriodException.class)
+    public ResponseEntity<ErrorResponseDTO> handleException(InvalidReservationPeriodException exception) {
+        return createEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
