@@ -14,11 +14,13 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             "WHERE r.classroom.id = :classroomId " +
             "AND r.status <> 'CANCELLED' " +
             "AND r.startTime < :end " +
-            "AND r.endTime > :start")
+            "AND r.endTime > :start " +
+            "AND (:excludeId IS NULL OR r.id <> :excludeId)")
     List<Reservation> findConflictingReservations(
             @Param("classroomId") UUID classroomId,
             @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
+            @Param("end") LocalDateTime end,
+            @Param("excludeId") UUID excludeId
     );
 
 

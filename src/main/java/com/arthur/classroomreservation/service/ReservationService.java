@@ -1,15 +1,20 @@
 package com.arthur.classroomreservation.service;
 
 import com.arthur.classroomreservation.dto.request.ReservationRequestDTO;
+import com.arthur.classroomreservation.dto.request.ReservationUpdateRequestDTO;
 import com.arthur.classroomreservation.dto.response.ReservationResponseDTO;
 import com.arthur.classroomreservation.entity.Classroom;
 import com.arthur.classroomreservation.entity.Reservation;
 import com.arthur.classroomreservation.entity.enums.ReservationStatus;
 import com.arthur.classroomreservation.exception.ClassroomAlreadyReservedAtSpecificPeriodException;
 import com.arthur.classroomreservation.exception.InvalidReservationPeriodException;
+import com.arthur.classroomreservation.exception.ReservationNotFoundException;
 import com.arthur.classroomreservation.repository.ReservationRepository;
 import com.arthur.classroomreservation.util.DateTimeUtils;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
 public class ReservationService {
@@ -27,16 +32,7 @@ public class ReservationService {
     public ReservationResponseDTO create(ReservationRequestDTO request) {
         Classroom classroom = classroomService.getEntityById(request.classroomId());
 
-        if(!DateTimeUtils.isEndAfterStart(request.startTime(), request.endTime())){
-            throw new InvalidReservationPeriodException(request.startTime(), request.endTime());
-        }
-
-        if(!reservationRepository.findConflictingReservations(request.classroomId(), request.startTime(), request.endTime()).isEmpty()){
-            throw new ClassroomAlreadyReservedAtSpecificPeriodException(
-                    request.classroomId(),
-                    request.startTime(),
-                    request.endTime());
-        }
+        checkReservationPossible(request.startTime(), request.endTime(), request.classroomId());
 
         return ReservationResponseDTO.from(reservationRepository.save(
                 Reservation.builder()
@@ -47,5 +43,40 @@ public class ReservationService {
                         .build()
                 )
         );
+    }
+
+    public ReservationResponseDTO update(UUID id, ReservationUpdateRequestDTO request) {
+        Reservation reservation = reservationRepository.findById(id)
+                .orElseThrow(() -> new ReservationNotFoundException(id));
+
+        applyUpdates(reservation, request);
+        checkReservationPossible(reservation.getId(), reservation.getStartTime(), reservation.getEndTime(), reservation.getClassroom().getId());
+
+        return ReservationResponseDTO.from(reservationRepository.save(reservation));
+    }
+
+    private void applyUpdates(Reservation reservation, ReservationUpdateRequestDTO request) {
+        if(request.startTime() != null) reservation.setStartTime(request.startTime());
+        if(request.endTime() != null) reservation.setEndTime(request.endTime());
+        if(request.classroomId() != null) reservation.setClassroom(
+                classroomService.getEntityById(request.classroomId())
+        );
+    }
+
+    private void checkReservationPossible(LocalDateTime startTime, LocalDateTime endTime, UUID classroomId) {
+        checkReservationPossible(null, startTime, endTime, classroomId);
+    }
+
+    private void checkReservationPossible(UUID id, LocalDateTime startTime, LocalDateTime endTime, UUID classroomId) {
+        if(!DateTimeUtils.isEndAfterStart(startTime, endTime)){
+            throw new InvalidReservationPeriodException(startTime, endTime);
+        }
+
+        if(!reservationRepository.findConflictingReservations(classroomId, startTime, endTime, id).isEmpty()){
+            throw new ClassroomAlreadyReservedAtSpecificPeriodException(
+                    classroomId,
+                    startTime,
+                    endTime);
+        }
     }
 }
