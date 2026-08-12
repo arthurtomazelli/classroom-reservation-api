@@ -27,8 +27,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     @Query("SELECT r FROM Reservation r " +
             "WHERE (:classroomId IS NULL OR r.classroom.id = :classroomId) " +
             "AND (:status IS NULL OR r.status = :status) " +
-            "AND (:startTime IS NULL OR r.endTime > :startTime) " +
-            "AND (:endTime IS NULL OR r.startTime < :endTime)")
+            "AND (CAST(:startTime AS timestamp) IS NULL OR r.endTime > :startTime) " +
+            "AND (CAST(:endTime AS timestamp) IS NULL OR r.startTime < :endTime)")
     List<Reservation> findWithFilters(
             @Param("classroomId") UUID classroomId,
             @Param("status") ReservationStatus status,
