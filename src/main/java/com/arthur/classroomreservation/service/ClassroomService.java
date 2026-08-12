@@ -61,7 +61,7 @@ public class ClassroomService {
     public ClassroomResponseDTO findById(UUID id) {
         return ClassroomResponseDTO.from(
                 classroomRepository.findById(id)
-                .orElseThrow(() -> new ClassroomNotFoundException(id))) ;
+                        .orElseThrow(() -> new ClassroomNotFoundException(id))) ;
     }
 
     public ClassroomResponseDTO deactivate(UUID id) {

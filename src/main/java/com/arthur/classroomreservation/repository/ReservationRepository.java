@@ -1,6 +1,7 @@
 package com.arthur.classroomreservation.repository;
 
 import com.arthur.classroomreservation.entity.Reservation;
+import com.arthur.classroomreservation.entity.enums.ReservationStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,6 +22,18 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             @Param("excludeId") UUID excludeId
+    );
+
+    @Query("SELECT r FROM Reservation r " +
+            "WHERE (:classroomId IS NULL OR r.classroom.id = :classroomId) " +
+            "AND (:status IS NULL OR r.status = :status) " +
+            "AND (:startTime IS NULL OR r.endTime > :startTime) " +
+            "AND (:endTime IS NULL OR r.startTime < :endTime)")
+    List<Reservation> findWithFilters(
+            @Param("classroomId") UUID classroomId,
+            @Param("status") ReservationStatus status,
+            @Param("startTime") LocalDateTime startTime,
+            @Param("endTime") LocalDateTime endTime
     );
 
 

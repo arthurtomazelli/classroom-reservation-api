@@ -14,6 +14,7 @@ import com.arthur.classroomreservation.util.DateTimeUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -78,5 +79,28 @@ public class ReservationService {
                     startTime,
                     endTime);
         }
+    }
+
+    public ReservationResponseDTO findById(UUID id) {
+        return ReservationResponseDTO.from(
+                reservationRepository.findById(id)
+                        .orElseThrow(() -> new ReservationNotFoundException(id))
+        );
+    }
+
+    public ReservationResponseDTO cancel(UUID id) {
+        Reservation reservation =  reservationRepository.findById(id)
+                .orElseThrow(() -> new ReservationNotFoundException(id));
+
+        reservation.setStatus(ReservationStatus.CANCELLED);
+
+        return ReservationResponseDTO.from(reservationRepository.save(reservation));
+    }
+
+    public List<ReservationResponseDTO> list(UUID classroomId, LocalDateTime startTime, LocalDateTime endTime, ReservationStatus status) {
+        return reservationRepository.findWithFilters(classroomId, status, startTime, endTime)
+                .stream()
+                .map(ReservationResponseDTO::from)
+                .toList();
     }
 }
