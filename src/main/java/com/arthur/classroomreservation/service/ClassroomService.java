@@ -21,21 +21,7 @@ public class ClassroomService {
     }
 
     public ClassroomResponseDTO create(ClassroomRequestDTO request) {
-        checkDuplicate(request.block(), request.number());
-
-        return ClassroomResponseDTO.from(classroomRepository.save(
-                Classroom.builder()
-                .block(request.block())
-                .number(request.number())
-                .capacity(request.capacity())
-                .type(request.type())
-                .available(true)
-                .build())
-        );
-    }
-
-    private void checkDuplicate(String block, String number){
-        classroomRepository.findByBlockAndNumber(block, number)
+        classroomRepository.findByBlockAndNumber(request.block(), request.number())
                 .ifPresent(existing -> {
                     throw new ClassroomAlreadyExistsException(
                             existing.getBlock(),
@@ -43,6 +29,16 @@ public class ClassroomService {
                             existing.getId()
                     );
                 });
+
+        return ClassroomResponseDTO.from(classroomRepository.save(
+                Classroom.builder()
+                        .block(request.block())
+                        .number(request.number())
+                        .capacity(request.capacity())
+                        .type(request.type())
+                        .available(true)
+                        .build())
+        );
     }
 
     public ClassroomResponseDTO update(UUID id, ClassroomUpdateRequestDTO request) {
