@@ -88,8 +88,8 @@ public class ClassroomService {
                 .toList();
     }
 
-    public List<ClassroomResponseDTO> findAvailableForReservation(LocalDateTime startTime, LocalDateTime endTime) {
-        return classroomRepository.findAvailableForReservation(startTime, endTime)
+    public List<ClassroomResponseDTO> findFreeForReservation(LocalDateTime startTime, LocalDateTime endTime) {
+        return classroomRepository.findFreeForReservation(startTime, endTime)
                 .stream()
                 .map(ClassroomResponseDTO::from)
                 .toList();

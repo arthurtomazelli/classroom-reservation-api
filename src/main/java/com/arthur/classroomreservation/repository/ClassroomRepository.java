@@ -26,7 +26,7 @@ public interface ClassroomRepository extends JpaRepository<Classroom, UUID>{
             "    AND r.startTime < :end " +
             "    AND r.endTime > :start" +
             ")")
-    List<Classroom> findAvailableForReservation(
+    List<Classroom> findFreeForReservation(
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );

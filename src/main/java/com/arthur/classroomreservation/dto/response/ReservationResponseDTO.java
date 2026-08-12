@@ -1,6 +1,5 @@
 package com.arthur.classroomreservation.dto.response;
 
-import com.arthur.classroomreservation.entity.Classroom;
 import com.arthur.classroomreservation.entity.Reservation;
 import com.arthur.classroomreservation.entity.enums.ReservationStatus;
 
@@ -12,7 +11,7 @@ public record ReservationResponseDTO(
         LocalDateTime startTime,
         LocalDateTime endTime,
         ReservationStatus status,
-        Classroom classroom
+        ClassroomResponseDTO classroom
 ) {
     public static ReservationResponseDTO from(Reservation reservation) {
         return new ReservationResponseDTO(
@@ -20,7 +19,7 @@ public record ReservationResponseDTO(
                 reservation.getStartTime(),
                 reservation.getEndTime(),
                 reservation.getStatus(),
-                reservation.getClassroom()
+                ClassroomResponseDTO.from(reservation.getClassroom())
         );
     }
 }
