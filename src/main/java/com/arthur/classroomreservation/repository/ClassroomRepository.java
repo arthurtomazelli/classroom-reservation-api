@@ -1,7 +1,9 @@
 package com.arthur.classroomreservation.repository;
 
 import com.arthur.classroomreservation.entity.Classroom;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -30,4 +32,8 @@ public interface ClassroomRepository extends JpaRepository<Classroom, UUID>{
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end
     );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT c FROM Classroom c WHERE c.id = :id")
+    Optional<Classroom> findByIdForUpdate(@Param("id") UUID id);
 }
