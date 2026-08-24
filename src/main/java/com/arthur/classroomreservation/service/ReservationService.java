@@ -12,6 +12,7 @@ import com.arthur.classroomreservation.exception.ReservationNotFoundException;
 import com.arthur.classroomreservation.repository.ReservationRepository;
 import com.arthur.classroomreservation.util.DateTimeUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -30,8 +31,9 @@ public class ReservationService {
         this.classroomService = classroomService;
     }
 
+    @Transactional
     public ReservationResponseDTO create(ReservationRequestDTO request) {
-        Classroom classroom = classroomService.getEntityById(request.classroomId());
+        Classroom classroom = classroomService.getEntityForUpdate(request.classroomId());
 
         checkReservationPossible(request.startTime(), request.endTime(), request.classroomId());
 

@@ -99,4 +99,9 @@ public class ClassroomService {
         return classroomRepository.findById(id)
                 .orElseThrow(() -> new ClassroomNotFoundException(id));
     }
+
+    public Classroom getEntityForUpdate(UUID id) {
+        return classroomRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new ClassroomNotFoundException(id));
+    }
 }
